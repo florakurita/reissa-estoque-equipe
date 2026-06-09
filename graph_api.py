@@ -36,6 +36,9 @@ def get_file_id():
 def get_base_url():
     return f"https://graph.microsoft.com/v1.0/me/drive/items/{get_file_id()}/workbook"
 
+# Abas com headers na linha 3 (título + aviso + header)
+ABAS_LINHA3 = ["Histórico Preços"]
+
 @st.cache_data(ttl=300)
 def ler_aba(nome_aba):
     headers = get_headers()
@@ -44,7 +47,12 @@ def ler_aba(nome_aba):
     if "values" not in data or len(data["values"]) < 2:
         return pd.DataFrame()
     values = data["values"]
-    df = pd.DataFrame(values[2:], columns=values[1])
+    if nome_aba in ABAS_LINHA3:
+        # Header na linha 3 (índice 2), dados a partir da linha 4 (índice 3)
+        df = pd.DataFrame(values[3:], columns=values[2])
+    else:
+        # Header na linha 2 (índice 1), dados a partir da linha 3 (índice 2)
+        df = pd.DataFrame(values[2:], columns=values[1])
     return df.dropna(how='all')
 
 @st.cache_data(ttl=300)
