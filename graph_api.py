@@ -32,6 +32,8 @@ def get_file_id():
         raise Exception(f"Arquivo não encontrado: {resp}")
     return resp["id"]
 
+def get_base_url():
+    return f"https://graph.microsoft.com/v1.0/me/drive/items/{get_file_id()}/workbook"
 
 # Abas com headers na linha 3 (título + aviso + header)
 ABAS_LINHA3 = ["Histórico Preços"]
