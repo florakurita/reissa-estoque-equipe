@@ -6,7 +6,6 @@ CLIENT_ID     = st.secrets["CLIENT_ID"]
 REFRESH_TOKEN = st.secrets["REFRESH_TOKEN"]
 FILE_NAME     = "Gestao_Estoque_Reissa_Modas.xlsx"
 
-
 def get_token():
     url = "https://login.microsoftonline.com/consumers/oauth2/v2.0/token"
     data = {
