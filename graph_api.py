@@ -26,7 +26,7 @@ def get_headers():
 @st.cache_data(ttl=3600)
 def get_file_id():
     headers = get_headers()
-    url = f"https://graph.microsoft.com/v1.0/me/drive/root/search(q='{FILE_NAME}')"
+    url = f"https://graph.microsoft.com/v1.0/me/drive/root:/Aplicativo Reissa Modas/{FILE_NAME}:"
     resp = requests.get(url, headers=headers).json()
     for item in resp.get("value", []):
         if item["name"] == FILE_NAME:
