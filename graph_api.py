@@ -1,38 +1,28 @@
 import requests
-import msal
 import streamlit as st
 import pandas as pd
 
-CLIENT_ID  = st.secrets["CLIENT_ID"]
-TENANT_ID  = "consumers"
-AUTHORITY  = f"https://login.microsoftonline.com/{TENANT_ID}"
-SCOPES     = ["Files.ReadWrite", "User.Read"]
-FILE_NAME  = "Gestao_Estoque_Reissa_Modas.xlsx"
+CLIENT_ID     = st.secrets["CLIENT_ID"]
+CLIENT_SECRET = st.secrets["CLIENT_SECRET"]
+REFRESH_TOKEN = st.secrets["REFRESH_TOKEN"]
+TENANT_ID     = "consumers"
+FILE_NAME     = "Gestao_Estoque_Reissa_Modas.xlsx"
 
 def get_token():
-    app = msal.PublicClientApplication(CLIENT_ID, authority=AUTHORITY)
-
-    accounts = app.get_accounts()
-    if accounts:
-        result = app.acquire_token_silent(SCOPES, account=accounts[0])
-        if result and "access_token" in result:
-            return result["access_token"]
-
-    flow = app.initiate_device_flow(scopes=SCOPES)
-    if "user_code" not in flow:
-        raise Exception("Erro ao iniciar autenticação")
-
-    st.warning(f"""
-    **Autenticação necessária!**
-    1. Acesse: **{flow['verification_uri']}**
-    2. Digite o código: **{flow['user_code']}**
-    3. Aguarde...
-    """)
-
-    result = app.acquire_token_by_device_flow(flow)
-    if "access_token" in result:
-        return result["access_token"]
-    raise Exception(f"Erro: {result.get('error_description')}")
+    """Obtém access token usando refresh token"""
+    url = f"https://login.microsoftonline.com/{TENANT_ID}/oauth2/v2.0/token"
+    data = {
+        "grant_type":    "refresh_token",
+        "client_id":     CLIENT_ID,
+        "client_secret": CLIENT_SECRET,
+        "refresh_token": REFRESH_TOKEN,
+        "scope":         "Files.ReadWrite User.Read offline_access"
+    }
+    resp = requests.post(url, data=data)
+    result = resp.json()
+    if "access_token" not in result:
+        raise Exception(f"Erro de autenticação: {result.get('error_description', result)}")
+    return result["access_token"]
 
 def get_headers():
     return {"Authorization": f"Bearer {get_token()}", "Content-Type": "application/json"}
@@ -62,16 +52,16 @@ def ler_aba(nome_aba):
     return df.dropna(how='all')
 
 @st.cache_data(ttl=300)
-def ler_cadastro():    return ler_aba("Cadastro")
+def ler_cadastro():         return ler_aba("Cadastro")
 
 @st.cache_data(ttl=300)
-def ler_compras():     return ler_aba("Compras")
+def ler_compras():          return ler_aba("Compras")
 
 @st.cache_data(ttl=300)
-def ler_inventario():  return ler_aba("Inventário")
+def ler_inventario():       return ler_aba("Inventário")
 
 @st.cache_data(ttl=300)
-def ler_depara():      return ler_aba("De-Para Códigos")
+def ler_depara():           return ler_aba("De-Para Códigos")
 
 @st.cache_data(ttl=300)
 def ler_historico_precos(): return ler_aba("Histórico Preços")
@@ -122,7 +112,6 @@ def calcular_saldo(codigo, tamanho, df_inventario, df_compras):
             (df_compras["Tipo"].astype(str) == "Compra")
         ]
         return int(comp["Quantidade"].sum()) if not comp.empty else 0
-
     try:
         inv = inv.copy()
         inv["Data_dt"] = pd.to_datetime(inv["Data"], dayfirst=True, errors='coerce')
@@ -131,12 +120,10 @@ def calcular_saldo(codigo, tamanho, df_inventario, df_compras):
         qtd_inv = int(float(str(ultimo["Quantidade"] or 0)))
     except:
         return 0
-
     comp = df_compras[
         (df_compras["Código"].astype(str) == cod) &
         (df_compras["Tamanho"].astype(str) == tam)
     ].copy()
-
     qtd_comp = 0
     if not comp.empty:
         try:
@@ -146,7 +133,6 @@ def calcular_saldo(codigo, tamanho, df_inventario, df_compras):
             qtd_comp = int(entradas["Quantidade"].sum()) - int(saidas["Quantidade"].sum())
         except:
             pass
-
     return qtd_inv + qtd_comp
 
 def get_preco_atual(codigo, grupo_tamanho, df_precos):
