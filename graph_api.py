@@ -28,13 +28,10 @@ def get_file_id():
     headers = get_headers()
     url = f"https://graph.microsoft.com/v1.0/me/drive/root:/Aplicativo Reissa Modas/{FILE_NAME}:"
     resp = requests.get(url, headers=headers).json()
-    for item in resp.get("value", []):
-        if item["name"] == FILE_NAME:
-            return item["id"]
-    raise Exception(f"Arquivo '{FILE_NAME}' não encontrado!")
+    if "id" not in resp:
+        raise Exception(f"Arquivo não encontrado: {resp}")
+    return resp["id"]
 
-def get_base_url():
-    return f"https://graph.microsoft.com/v1.0/me/drive/items/{get_file_id()}/workbook"
 
 # Abas com headers na linha 3 (título + aviso + header)
 ABAS_LINHA3 = ["Histórico Preços"]
