@@ -25,13 +25,15 @@ st.markdown("""
 <style>
     .big-code { font-size: 26px !important; font-weight: bold; color: #1F3864; }
     .big-tam  { font-size: 22px !important; font-weight: bold; }
-    .card     { background: #f8f9fa; border-radius: 10px; padding: 16px; margin: 8px 0; border: 1px solid #dee2e6; }
+    .card     { background: #f8f9fa; border-radius: 10px; padding: 16px; margin: 8px 0; border: 1px solid #dee2e6; color: #1a1a1a !important; }
+    .card b, .card span { color: #1a1a1a !important; }
     .preco    { font-size: 22px; font-weight: bold; color: #0F6E56; }
     .aviso    { background: #FFF3CD; border-radius: 8px; padding: 12px; border: 1px solid #BA7517; color: #333; }
     .nome-produto { font-size: 16px; color: #333333; font-weight: normal; }
     div[data-testid="stNumberInput"] input { font-size: 22px !important; font-weight: bold; }
     div[data-testid="stTable"] { font-size: 16px !important; }
-    .resultado-consulta { background: #EBF3FB; border-radius: 10px; padding: 16px; margin: 8px 0; }
+    .resultado-consulta { background: #EBF3FB; border-radius: 10px; padding: 16px; margin: 8px 0; color: #1a1a1a !important; }
+    .resultado-consulta * { color: #1a1a1a !important; }
 </style>
 """, unsafe_allow_html=True)
 
