@@ -3,18 +3,14 @@ import streamlit as st
 import pandas as pd
 
 CLIENT_ID     = st.secrets["CLIENT_ID"]
-CLIENT_SECRET = st.secrets["CLIENT_SECRET"]
 REFRESH_TOKEN = st.secrets["REFRESH_TOKEN"]
-TENANT_ID     = "consumers"
 FILE_NAME     = "Gestao_Estoque_Reissa_Modas.xlsx"
 
 def get_token():
-    """Obtém access token usando refresh token"""
-    url = f"https://login.microsoftonline.com/{TENANT_ID}/oauth2/v2.0/token"
+    url = "https://login.microsoftonline.com/consumers/oauth2/v2.0/token"
     data = {
         "grant_type":    "refresh_token",
         "client_id":     CLIENT_ID,
-        "client_secret": CLIENT_SECRET,
         "refresh_token": REFRESH_TOKEN,
         "scope":         "Files.ReadWrite User.Read offline_access"
     }
